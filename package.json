@@ -8,12 +8,15 @@
     "fluxapp",
     "router"
   ],
+  "scripts" : {
+    "test" : "./node_modules/karma/bin/karma start"
+  },
   "author": "Michal Kawalec",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^2.3.11",
     "flux": "^2.0.1",
-    "lodash": "^2.4.1"
+    "lodash": "^2.4.1",
+    "fluxapp": "colonyamerican/fluxApp"
   },
   "devDependencies": {
     "chai": "^1.10.0",
