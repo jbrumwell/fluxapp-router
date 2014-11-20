@@ -8,15 +8,16 @@
     "fluxapp",
     "router"
   ],
-  "scripts" : {
-    "test" : "./node_modules/karma/bin/karma start"
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start"
   },
   "author": "Michal Kawalec",
   "license": "MIT",
   "dependencies": {
     "flux": "^2.0.1",
+    "fluxapp": "colonyamerican/fluxApp",
     "lodash": "^2.4.1",
-    "fluxapp": "colonyamerican/fluxApp"
+    "react": "^0.12.1"
   },
   "devDependencies": {
     "chai": "^1.10.0",
