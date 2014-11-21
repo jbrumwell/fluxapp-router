@@ -5,6 +5,9 @@ var _ = require('lodash');
 var React = require('react/addons');
 var router = require('../lib');
 
+var Form = router.components.Form;
+
+
 describe('Components', function() {
 
   var renderedComponent;
@@ -86,9 +89,12 @@ describe('Components', function() {
       var spy = sinon.spy(router, 'go');
 
       renderedComponent = renderComponent(
-        <router.components.Form action='/somewhere' method='post' />);
+        <Form action='/somewhere' method='post'>
+          <button type='submit'/>
+        </Form>
+      );
 
-      renderedComponent.getDOMNode().submit();
+      renderedComponent.getDOMNode().childNodes[0].click();
 
       expect(spy.called).to.equal(true);
       expect(spy.args[0][0]).to.equal('/somewhere');
@@ -98,8 +104,37 @@ describe('Components', function() {
     });
 
 
-    it('should propagate the force parameter');
-    it('should set attributes properly');
+    it('should propagate the force parameter', function() {
+      var spy = sinon.spy(router, 'go');
+
+      renderedComponent = renderComponent(
+        <Form action='/somewhere' method='post' force={true}>
+          <button type='submit'/>
+        </Form>
+      );
+
+      renderedComponent.getDOMNode().childNodes[0].click();
+      
+      expect(spy.called).to.equal(true);
+      expect(spy.args[0][1].force).to.equal(true);
+      router.go.restore();
+    });
+
+    it('should set attributes properly', function() {
+      var spy = sinon.spy(router, 'go');
+
+      renderedComponent = renderComponent(
+        <Form action='/somewhere' method='post' 
+          data-foo={true} 
+          data-parachutes='landed'
+          />
+      );
+
+      var node = renderedComponent.getDOMNode();
+      expect(node.getAttribute('data-foo')).to.equal('true');
+      expect(node.getAttribute('data-parachutes')).to.equal('landed');   
+      router.go.restore();
+    });
 
   });
 

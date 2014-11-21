@@ -11,7 +11,6 @@ var form = React.DOM.form;
 module.exports = React.createClass({
 
   onSubmit : function handleSubmit(e) {
-    console.log('in submit handler');
     e.preventDefault();
 
     router.go(this.props.action, { 
