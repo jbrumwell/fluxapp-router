@@ -2,6 +2,7 @@
   "name": "fluxapp-router",
   "version": "0.1.0",
   "description": "A router for flux app",
+  "main" : "lib/index.js",
   "keywords": [
     "isomorphic",
     "flux",
