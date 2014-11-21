@@ -10,7 +10,8 @@ var form = React.DOM.form;
 
 module.exports = React.createClass({
 
-  onSubmit : function(e) {
+  onSubmit : function handleSubmit(e) {
+    console.log('in submit handler');
     e.preventDefault();
 
     router.go(this.props.action, { 
@@ -20,11 +21,11 @@ module.exports = React.createClass({
     });
   },
 
-  render : function() {
+  render : function render() {
     var props = _.clone(this.props);
     delete props.force;
 
-    props.onSubmit = props.onSubmit || this.onSubmit;
+    props.onSubmit = this.onSubmit;
     return form(props);
   }
 });

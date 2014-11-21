@@ -24,8 +24,9 @@ describe('Components', function() {
   });
 
   it('Should expose correct components', function() {
-    expect(_.keys(router.components).length).to.equal(1);
+    expect(_.keys(router.components).length).to.equal(2);
     expect(_.keys(router.components)).to.contain('Link');
+    expect(_.keys(router.components)).to.contain('Form');
   });
 
   describe('Link component', function() {
@@ -71,7 +72,34 @@ describe('Components', function() {
       expect(node.getAttribute('href')).to.equal('/that');
     });
 
+    it('should render the contents correctly', function() {
+      renderedComponent = renderComponent(
+        <router.components.Link href='/that'>Something</router.components.Link>);
+      var node = renderedComponent.getDOMNode();
 
+      expect(node.innerHTML).to.equal('Something');
+    });
+  });
+
+  describe('Form component', function() {
+    it('should call an onSubmit handler on submit', function() {
+      var spy = sinon.spy(router, 'go');
+
+      renderedComponent = renderComponent(
+        <router.components.Form action='/somewhere' method='post' />);
+
+      renderedComponent.getDOMNode().submit();
+
+      expect(spy.called).to.equal(true);
+      expect(spy.args[0][0]).to.equal('/somewhere');
+      expect(spy.args[0][1].method).to.equal('post');
+
+      router.go.restore();
+    });
+
+
+    it('should propagate the force parameter');
+    it('should set attributes properly');
 
   });
 
