@@ -58,7 +58,7 @@ describe('Router', function() {
   });
 
   it('should check with fluxApp internal router if a path matches a route', function() {
-    mock.expects('getRoute').once().returns({
+    mock.expects('getRoute').twice().returns({
       path : '/',
       method : 'GET'
     });
@@ -68,7 +68,7 @@ describe('Router', function() {
   });
 
   it('should dispatch a route.change action if a route was found', function() {
-    mock.expects('getRoute').once().returns({
+    mock.expects('getRoute').twice().returns({
       path : '/',
       method : 'GET'
     });
@@ -98,7 +98,7 @@ describe('Router', function() {
   });
 
   it('should update history state on successful route change', function() {
-    mock.expects('getRoute').once().returns({
+    mock.expects('getRoute').twice().returns({
       path : '/foo',
       method : 'GET'
     });
@@ -113,7 +113,7 @@ describe('Router', function() {
   });
 
   it('should not enable going to the same route twice', function() {
-    mock.expects('getRoute').once().returns({
+    mock.expects('getRoute').twice().returns({
       path : '/',
       method : 'GET'
     });
@@ -131,7 +131,7 @@ describe('Router', function() {
 
 
   it('should enable going to the same route twice with force', function() {
-    mock.expects('getRoute').twice().returns({
+    mock.expects('getRoute').exactly(4).returns({
       path : '/',
       method : 'GET'
     });
@@ -146,8 +146,8 @@ describe('Router', function() {
     mock.verify();
   });
 
-  it('Should move back in history', function() {
-    mock.expects('getRoute').twice().returns({
+  it('should move back in history', function() {
+    mock.expects('getRoute').exactly(4).returns({
       path : '/',
       method : 'GET'
     });
@@ -163,7 +163,7 @@ describe('Router', function() {
   });
 
   it('should not move back too far', function() {
-    mock.expects('getRoute').twice().returns({
+    mock.expects('getRoute').exactly(4).returns({
       path : '/',
       method : 'GET'
     });
@@ -189,7 +189,7 @@ describe('Router', function() {
   });
 
   it('should move forward', function() {
-    mock.expects('getRoute').twice().returns({
+    mock.expects('getRoute').exactly(4).returns({
       path : '/',
       method : 'GET'
     });
@@ -220,7 +220,7 @@ describe('Router', function() {
   it('should update the state correctly if a new route was requested after being back in history',
       function() {
 
-    mock.expects('getRoute').thrice().returns({
+    mock.expects('getRoute').exactly(6).returns({
       path : '/',
       method : 'GET'
     });
