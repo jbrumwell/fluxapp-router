@@ -28,7 +28,7 @@ describe('Router', function() {
   afterEach(function() {
     fluxApp.getRouter = oldGetRouter;
 
-    var store = fluxApp.getStore('route');
+    var store = router.getStore();
     store.state = store.getInitialState();
   });
     
@@ -41,18 +41,18 @@ describe('Router', function() {
   });
 
   it('should register a route store', function() {
-    expect(fluxApp.getStore('route')).to.not.equal(undefined);
+    expect(router.getStore()).to.not.equal(undefined);
   });
 
   it('start with an empty state', function() {
-    var state = fluxApp.getStore('route').state;
+    var state = router.getStore().state;
     expect(state.history.length).to.equal(0);
     expect(_.keys(state.current).length).to.equal(0);
     expect(state.currentIdx).to.equal(0);
   });
 
   it('should create a route change action', function() {
-    var actions = fluxApp.getActions('route');
+    var actions = router.getActions();
     expect(_.keys(actions).length).to.equal(1);
     expect(typeof actions.change).to.equal('function');
   });
@@ -75,7 +75,7 @@ describe('Router', function() {
 
     var processToken = Dispatcher.register(function processAction(action) {
       Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('ROUTE_CHANGE');
+      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE');
 
       mock.verify();
     });
@@ -88,7 +88,7 @@ describe('Router', function() {
 
     var processToken = Dispatcher.register(function processAction(action) {
       Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('ROUTE_CHANGE_FAILED');
+      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
       expect(action.payload.message).to.contain("doesn't match");
 
       mock.verify();
@@ -105,11 +105,12 @@ describe('Router', function() {
 
     router.go('/foo');
 
-    var routes = fluxApp.getStore('route');
+    var routes = router.getStore();
     expect(routes.state.current.path).to.equal('/foo');
     expect(routes.state.currentIdx).to.equal(0);
     expect(routes.state.history.length).to.equal(1);
 
+    mock.verify();
   });
 
   it('should not enable going to the same route twice', function() {
@@ -121,7 +122,7 @@ describe('Router', function() {
 
     var processToken = Dispatcher.register(function processAction(action) {
       Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('ROUTE_CHANGE_FAILED');
+      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
       expect(action.payload.message).to.contain("cannot be applied twice");
     });
 
@@ -139,7 +140,7 @@ describe('Router', function() {
     router.go('/');
     var processToken = Dispatcher.register(function processAction(action) {
       Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('ROUTE_CHANGE');
+      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE');
     });
 
     router.go('/', { force : true });
@@ -156,7 +157,7 @@ describe('Router', function() {
     router.go('/apath');
     router.back();
 
-    var routes = fluxApp.getStore('route');
+    var routes = router.getStore();
     expect(routes.state.current.path).to.equal('/');
     expect(routes.state.currentIdx).to.equal(1);
     mock.verify();
@@ -174,10 +175,10 @@ describe('Router', function() {
     router.back();
     var processToken = Dispatcher.register(function processAction(action) {
       Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('ROUTE_CHANGE_FAILED');
+      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
       expect(action.payload.message).to.contain("Cannot move back");
 
-      var routes = fluxApp.getStore('route').state;
+      var routes = router.getStore().state;
       expect(routes.history.length).to.equal(2);
       expect(routes.currentIdx).to.equal(1);
       expect(_.isEqual(routes.history[routes.currentIdx], routes.current)).to.equal(true);
@@ -199,7 +200,7 @@ describe('Router', function() {
     router.back();
     router.forward();
 
-    var routes = fluxApp.getStore('route').state;
+    var routes = router.getStore().state;
     expect(routes.history.length).to.equal(2);
     expect(routes.currentIdx).to.equal(0);
     expect(_.isEqual(routes.history[routes.currentIdx], routes.current)).to.equal(true);
@@ -210,7 +211,7 @@ describe('Router', function() {
   it('should not move forward too far', function() {
     var processToken = Dispatcher.register(function processAction(action) {
       Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('ROUTE_CHANGE_FAILED');
+      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
       expect(action.payload.message).to.contain('Cannot move forward');
     });
 
@@ -230,7 +231,7 @@ describe('Router', function() {
     router.back();
     router.go('/another');
 
-    var routes = fluxApp.getStore('route').state;
+    var routes = router.getStore().state;
     expect(routes.history.length).to.equal(2);
     expect(routes.currentIdx).to.equal(0);
     expect(routes.current.path).to.equal('/another');
