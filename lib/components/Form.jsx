@@ -24,7 +24,12 @@ module.exports = React.createClass({
     var props = _.clone(this.props);
     delete props.force;
 
-    props.onSubmit = this.onSubmit;
+    if (router.isEnabled()) {
+      props.onSubmit = props.onSubmit || this.onSubmit;
+    } else {
+      delete props.onSubmit;
+    }
+
     return form(props);
   }
 });

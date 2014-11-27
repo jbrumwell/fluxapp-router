@@ -20,7 +20,12 @@ module.exports = React.createClass({
     var props = _.clone(this.props);
     delete props.force;
 
-    props.onClick = props.onClick || this.onClick;
+    if (router.isEnabled()) {
+      props.onClick = props.onClick || this.onClick;
+    } else {
+      delete props.onClick;
+    }
+
     return a(props);
   }
 });
