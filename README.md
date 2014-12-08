@@ -30,3 +30,15 @@ Used this way, this link will trigger a router state change, and if no routing i
 in your browser, will degrade to a simple link. All the properties apart from `force` will be
 passed to the internal `<a>` instance transparently.
 
+
+In order to notify the watchers at the moment of the first page render that the page had renedered,
+you have to do
+
+    router.init()
+
+after assigning the watchers with
+
+    router.getStore().addChangeListener(function(change) {
+    ...
+
+
