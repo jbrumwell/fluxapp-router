@@ -103,9 +103,9 @@ describe('Router', function() {
       method : 'GET'
     });
 
-    router.go('/foo123').spread(function(action, payload) {
+    router.go('/foo123').spread(function(actionName, payload) {
       var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload.id === payload.id) {
+        if (action.payload && action.payload.id === payload.id) {
           Dispatcher.unregister(processToken);
           var routes = router.getStore();
           expect(routes.state.current.path).to.equal('/foo123');
@@ -126,14 +126,17 @@ describe('Router', function() {
     });
     router.go('/');
 
-    var processToken = Dispatcher.register(function processAction(action) {
-      Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
-      expect(action.payload.message).to.contain("cannot be applied twice");
-    });
+    router.go('/').then(function(actionName, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload && action.payload.id === payload.id) {
+          Dispatcher.unregister(processToken);
 
-    router.go('/');
-    mock.verify();
+          expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
+          expect(action.payload.message).to.contain("cannot be applied twice");
+          mock.verify();
+        }
+      });
+    });
   });
 
 
@@ -144,13 +147,16 @@ describe('Router', function() {
     });
 
     router.go('/');
-    var processToken = Dispatcher.register(function processAction(action) {
-      Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE');
+    router.go('/', { force : true }).then(function(actionName, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload && action.payload.id === payload.id) {
+          Dispatcher.unregister(processToken);
+          expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE');
+          mock.verify();
+        }
+      });
     });
 
-    router.go('/', { force : true });
-    mock.verify();
   });
 
   it('should move back in history', function() {
@@ -161,12 +167,17 @@ describe('Router', function() {
 
     router.go('/');
     router.go('/apath');
-    router.back();
+    router.back().then(function(actionName, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload && action.payload.id === payload.id) {
 
-    var routes = router.getStore();
-    expect(routes.state.current.path).to.equal('/');
-    expect(routes.state.currentIdx).to.equal(1);
-    mock.verify();
+          var routes = router.getStore();
+          expect(routes.state.current.path).to.equal('/');
+          expect(routes.state.currentIdx).to.equal(1);
+          mock.verify();
+        }
+      });
+    });
   });
 
   it('should not move back too far', function() {
@@ -204,24 +215,30 @@ describe('Router', function() {
     router.go('/');
     router.go('/somewhere');
     router.back();
-    router.forward();
+    router.forward().then(function(actionName, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload && action.payload.id === payload.id) {
+          var routes = router.getStore().state;
+          expect(routes.history.length).to.equal(2);
+          expect(routes.currentIdx).to.equal(0);
+          expect(_.isEqual(routes.history[routes.currentIdx], routes.current)).to.equal(true);
 
-    var routes = router.getStore().state;
-    expect(routes.history.length).to.equal(2);
-    expect(routes.currentIdx).to.equal(0);
-    expect(_.isEqual(routes.history[routes.currentIdx], routes.current)).to.equal(true);
-
-    mock.verify();
+          mock.verify();
+        }
+      });
+    });
   });
 
   it('should not move forward too far', function() {
-    var processToken = Dispatcher.register(function processAction(action) {
-      Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
-      expect(action.payload.message).to.contain('Cannot move forward');
+    router.forward().then(function(actionName, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload && action.payload.id === payload.id) {
+          Dispatcher.unregister(processToken);
+          expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
+          expect(action.payload.message).to.contain('Cannot move forward');
+        }
+      });
     });
-
-    router.forward();
   });
 
   it('should update the state correctly if a new route was requested after being back in history',
@@ -236,13 +253,18 @@ describe('Router', function() {
     router.go('/somewhere');
     router.back();
     router.go('/another');
+    router.go('/another').then(function(actionName, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload && action.payload.id === payload.id) {
+          var routes = router.getStore().state;
+          expect(routes.history.length).to.equal(2);
+          expect(routes.currentIdx).to.equal(0);
+          expect(routes.current.path).to.equal('/another');
 
-    var routes = router.getStore().state;
-    expect(routes.history.length).to.equal(2);
-    expect(routes.currentIdx).to.equal(0);
-    expect(routes.current.path).to.equal('/another');
-
-    mock.verify();
+          mock.verify();
+        }
+      });
+    });
   });
 
 });
