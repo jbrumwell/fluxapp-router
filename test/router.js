@@ -97,20 +97,26 @@ describe('Router', function() {
     router.go('/');
   });
 
-  it('should update history state on successful route change', function() {
+  it('should update history state on successful route change', function(done) {
     mock.expects('getRoute').twice().returns({
-      path : '/foo',
+      path : '/foo123',
       method : 'GET'
     });
 
-    router.go('/foo');
+    router.go('/foo123').spread(function(action, payload) {
+      var processToken = Dispatcher.register(function processAction(action) {
+        if (action.payload.id === payload.id) {
+          Dispatcher.unregister(processToken);
+          var routes = router.getStore();
+          expect(routes.state.current.path).to.equal('/foo123');
+          expect(routes.state.currentIdx).to.equal(0);
 
-    var routes = router.getStore();
-    expect(routes.state.current.path).to.equal('/foo');
-    expect(routes.state.currentIdx).to.equal(0);
-    expect(routes.state.history.length).to.equal(1);
+          mock.verify();
+          done();
+        }
+      });
+    });
 
-    mock.verify();
   });
 
   it('should not enable going to the same route twice', function() {
