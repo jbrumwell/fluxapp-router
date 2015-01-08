@@ -41,4 +41,9 @@ after assigning the watchers with
     router.getStore().addChangeListener(function(change) {
     ...
 
+#### URL patterns
+
+fluxapp-router uses Fluxapp routing internally to expand and match urls. 
+Fluxapp uses [path-to-regexp](https://github.com/component/path-to-regexp) and 
+if you are wondering how to construct urls, please consult its documentation.
 
