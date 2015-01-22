@@ -1,6 +1,6 @@
 {
   "name": "fluxapp-router",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "A router for fluxApp",
   "main" : "lib/index.js",
   "keywords": [
