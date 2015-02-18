@@ -57,16 +57,6 @@ describe('Router', function() {
     expect(typeof actions.change).to.equal('function');
   });
 
-  it('should check with fluxApp internal router if a path matches a route', function() {
-    mock.expects('getRoute').twice().returns({
-      path : '/',
-      method : 'GET'
-    });
-
-    router.go('/');
-    mock.verify();
-  });
-
   it('should dispatch a route.change action if a route was found', function() {
     mock.expects('getRoute').twice().returns({
       path : '/',
