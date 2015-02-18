@@ -5,8 +5,6 @@ var React = require('react/addons');
 var router = require('../index');
 var _ = require('lodash');
 
-var store = router.getStore();
-
 var a = React.DOM.a;
 
 
@@ -22,6 +20,7 @@ module.exports = React.createClass({
     var props = _.clone(this.props);
     delete props.force;
 
+    var store = router.getStore();
     if (props.href === store.state.current.path) {
       props.className = 'current';
     }
