@@ -1,260 +1,112 @@
-/* global describe, it, afterEach, beforeEach, document, sinon, expect, require */
+/* global describe, it, beforeEach */
 'use strict';
+var expect = require('chai').expect;
 
-var _ = require('lodash');
-var fluxApp = require('fluxapp');
-var Dispatcher = fluxApp.getDispatcher();
-
-describe('Router', function() {
-  var oldGetRouter;
-  var getRouterReturn;
+describe('router', function() {
+  var fluxApp = require('../../lib');
+  var Router = require('../../lib/router');
+  var testRoutes = [
+    {
+      id : 1,
+      path : '/index',
+      method : 'GET'
+    },
+    {
+      id : 2,
+      path : '/index(/?)',
+      method : 'POST'
+    },
+    {
+      id : 3,
+      path : '/test/:named/:params'
+    },
+    {
+      id : 4,
+      path : '/test/optional/:params?'
+    },
+    {
+      id : 5,
+      path : '/notFound',
+      notFound : true
+    }
+  ];
   var router;
-  var mock;
 
   beforeEach(function() {
-    oldGetRouter = fluxApp.getRouter;
-    getRouterReturn = {
-      getRoute : function() {}
-    };
-
-    router = require('../lib');
-    mock = sinon.mock(getRouterReturn);
-
-    fluxApp.getRouter = function() {
-      return getRouterReturn;
-    };
+    router = new Router(testRoutes);
   });
 
-  afterEach(function() {
-    fluxApp.getRouter = oldGetRouter;
-
-    var store = router.getStore();
-    store.state = store.getInitialState();
-  });
-    
-
-  it('should expose three history management methods', function() {
-    expect(_.keys(router)).to.contain('forward');
-    expect(_.keys(router)).to.contain('back');
-    expect(_.keys(router)).to.contain('go');
-
+  it('should have an addRoute method', function() {
+    expect(router.addRoute).to.be.a('function');
   });
 
-  it('should register a route store', function() {
-    expect(router.getStore()).to.not.equal(undefined);
+  it('should have an addRoutes method', function() {
+    expect(router.addRoutes).to.be.a('function');
   });
 
-  it('start with an empty state', function() {
-    var state = router.getStore().state;
-    expect(state.history.length).to.equal(0);
-    expect(_.keys(state.current).length).to.equal(0);
-    expect(state.currentIdx).to.equal(0);
+  it('should have an getRoute method', function() {
+    expect(router.getRoute).to.be.a('function');
   });
 
-  it('should create a route change action', function() {
-    var actions = router.getActions();
-    expect(_.keys(actions).length).to.equal(1);
-    expect(typeof actions.change).to.equal('function');
-  });
-
-  it('should dispatch a route.change action if a route was found', function() {
-    mock.expects('getRoute').twice().returns({
-      path : '/',
-      method : 'GET'
+  describe('fluxApp', function() {
+    it('should have an getRouter method', function() {
+      expect(fluxApp.getRouter).to.be.a('function');
     });
 
-    var processToken = Dispatcher.register(function processAction(action) {
-      Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE');
-
-      mock.verify();
+    it('should have an createRoute method', function() {
+      expect(fluxApp.createRoute).to.be.a('function');
     });
 
-    router.go('/');
+    it('should have an matchRoute method', function() {
+      expect(fluxApp.matchRoute).to.be.a('function');
+    });
   });
 
-  it('should fail if no route was found', function() {
-    mock.expects('getRoute').once().returns(null);
-
-    var processToken = Dispatcher.register(function processAction(action) {
-      Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
-      expect(action.payload.message).to.contain("doesn't match");
-
-      mock.verify();
-    });
-
-    router.go('/');
-  });
-
-  it('should update history state on successful route change', function(done) {
-    mock.expects('getRoute').twice().returns({
-      path : '/foo123',
-      method : 'GET'
-    });
-
-    router.go('/foo123').spread(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-          Dispatcher.unregister(processToken);
-          var routes = router.getStore();
-          expect(routes.state.current.path).to.equal('/foo123');
-          expect(routes.state.currentIdx).to.equal(0);
-
-          mock.verify();
-          done();
-        }
+  describe('Matching', function() {
+    it('should consider route method if provided', function() {
+      var route = router.getRoute('/index', {
+        method : 'GET'
       });
-    });
 
-  });
+      expect(route.id).to.equal(1);
 
-  it('should not enable going to the same route twice', function() {
-    mock.expects('getRoute').twice().returns({
-      path : '/',
-      method : 'GET'
-    });
-    router.go('/');
-
-    router.go('/').then(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-          Dispatcher.unregister(processToken);
-
-          expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
-          expect(action.payload.message).to.contain("cannot be applied twice");
-          mock.verify();
-        }
+      route = router.getRoute('/index', {
+        method : 'POST'
       });
+
+      expect(route.id).to.equal(2);
+    });
+
+    it('should accept named parameters', function() {
+      var route = router.getRoute('/test/flux/rools');
+
+      expect(route.id).to.equal(3);
+    });
+
+    it('should allow optional param', function() {
+      var route = router.getRoute('/test/optional');
+
+      expect(route.id).to.equal(4);
+    });
+
+    it('should provide a 404 not found method', function() {
+      var route = router.getRoute('/something/doesnt/exist/here');
+
+      expect(route.id).to.equal(5);
+    });
+
+    it('should pull named params from the url', function() {
+      var route = router.getRoute('/test/first/second');
+
+      expect(route.params.named).to.equal('first');
+      expect(route.params.params).to.equal('second');
+    });
+
+    it('should parse query params', function() {
+      var route = router.getRoute('/index?something=else&that=this');
+
+      expect(route.query.something).to.equal('else');
+      expect(route.query.that).to.equal('this');
     });
   });
-
-
-  it('should enable going to the same route twice with force', function() {
-    mock.expects('getRoute').exactly(4).returns({
-      path : '/',
-      method : 'GET'
-    });
-
-    router.go('/');
-    router.go('/', { force : true }).then(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-          Dispatcher.unregister(processToken);
-          expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE');
-          mock.verify();
-        }
-      });
-    });
-
-  });
-
-  it('should move back in history', function() {
-    mock.expects('getRoute').exactly(4).returns({
-      path : '/',
-      method : 'GET'
-    });
-
-    router.go('/');
-    router.go('/apath');
-    router.back().then(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-
-          var routes = router.getStore();
-          expect(routes.state.current.path).to.equal('/');
-          expect(routes.state.currentIdx).to.equal(1);
-          mock.verify();
-        }
-      });
-    });
-  });
-
-  it('should not move back too far', function() {
-    mock.expects('getRoute').exactly(4).returns({
-      path : '/',
-      method : 'GET'
-    });
-
-    router.go('/');
-    router.go('/somewhere');
-
-    router.back();
-    var processToken = Dispatcher.register(function processAction(action) {
-      Dispatcher.unregister(processToken);
-      expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
-      expect(action.payload.message).to.contain("Cannot move back");
-
-      var routes = router.getStore().state;
-      expect(routes.history.length).to.equal(2);
-      expect(routes.currentIdx).to.equal(1);
-      expect(_.isEqual(routes.history[routes.currentIdx], routes.current)).to.equal(true);
-
-      mock.verify();
-    });
-
-    router.back();
-  });
-
-  it('should move forward', function() {
-    mock.expects('getRoute').exactly(4).returns({
-      path : '/',
-      method : 'GET'
-    });
-
-    router.go('/');
-    router.go('/somewhere');
-    router.back();
-    router.forward().then(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-          var routes = router.getStore().state;
-          expect(routes.history.length).to.equal(2);
-          expect(routes.currentIdx).to.equal(0);
-          expect(_.isEqual(routes.history[routes.currentIdx], routes.current)).to.equal(true);
-
-          mock.verify();
-        }
-      });
-    });
-  });
-
-  it('should not move forward too far', function() {
-    router.forward().then(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-          Dispatcher.unregister(processToken);
-          expect(action.actionType).to.equal('__ROUTEACTIONS_CHANGE_FAILED');
-          expect(action.payload.message).to.contain('Cannot move forward');
-        }
-      });
-    });
-  });
-
-  it('should update the state correctly if a new route was requested after being back in history',
-      function() {
-
-    mock.expects('getRoute').exactly(6).returns({
-      path : '/',
-      method : 'GET'
-    });
-
-    router.go('/');
-    router.go('/somewhere');
-    router.back();
-    router.go('/another');
-    router.go('/another').then(function(actionName, payload) {
-      var processToken = Dispatcher.register(function processAction(action) {
-        if (action.payload && action.payload.id === payload.id) {
-          var routes = router.getStore().state;
-          expect(routes.history.length).to.equal(2);
-          expect(routes.currentIdx).to.equal(0);
-          expect(routes.current.path).to.equal('/another');
-
-          mock.verify();
-        }
-      });
-    });
-  });
-
 });
