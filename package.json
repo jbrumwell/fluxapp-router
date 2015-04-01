@@ -1,6 +1,6 @@
 {
   "name": "fluxapp-router",
-  "version": "0.9.7",
+  "version": "1.0.0",
   "description": "A router for fluxApp",
   "main": "lib/index.js",
   "keywords": [
@@ -12,7 +12,9 @@
   "scripts": {
     "test": "./node_modules/karma/bin/karma start"
   },
-  "author": "Michal Kawalec",
+  "author": {
+    "name": "Michal Kawalec"
+  },
   "license": "MIT",
   "dependencies": {
     "flux": "^2.0.1",
@@ -32,7 +34,13 @@
     "karma-sourcemap-loader": "^0.3.0",
     "karma-webpack": "^1.3.1",
     "mocha": "^2.0.1",
-    "fluxapp": "colonyamerican/fluxApp",
+    "fluxapp": "git+https://github.com/colonyamerican/fluxApp",
     "webpack": "^1.4.13"
-  }
+  },
+  "gitHead": "9078c342b8b8a7541266d3efe47ff618fb975b2c",
+  "readme": "# fluxapp-router\n\nA router for fluxapp. Manages the current page state, gives you info about the \ncurrently opened page and history, and gracefully degrades on non-historyAPI \nand non-js browsers.\n\n### Usage\n\nFirst you have to initiate the router with instance of fluxApp used by your application:\n\n    var router = require('fluxapp-router').use(require('fluxapp'))\n\nFrom that point the router will keep info about state changes. The current state is\nkept in a vanilla fluxApp store, which can be accessed with a `getStore()` method\non the `router` object. You will want to add some watchers to trigger re-renders of\nyour page when the state changes.\n\nThen inside your views, you need some links that are router-compatible, so that\nthey don't require your whole page to reload (that would be wasteful):\n\n    var Link = require('fluxapp-router').components.Link;\n\n    ...\n\n    render: function() {\n      return <Link href='/hi'>Hi, I am a link</Link>;\n\n\nUsed this way, this link will trigger a router state change, and if no routing is available\nin your browser, will degrade to a simple link. All the properties apart from `force` will be\npassed to the internal `<a>` instance transparently.\n\n\nIn order to notify the watchers at the moment of the first page render that the page had renedered,\nyou have to do\n\n    router.init()\n\nafter assigning the watchers with\n\n    router.getStore().addChangeListener(function(change) {\n    ...\n\n#### URL patterns\n\nfluxapp-router uses Fluxapp routing internally to expand and match urls. \nFluxapp uses [path-to-regexp](https://github.com/component/path-to-regexp) and \nif you are wondering how to construct urls, please consult its documentation.\n\n",
+  "readmeFilename": "README.md",
+  "_id": "fluxapp-router@0.9.7",
+  "_shasum": "7ebbde72f40e8a98e7fd26dde38a595a02ba127a",
+  "_from": "fluxapp-router@>=0.9.6 <0.10.0"
 }
