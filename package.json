@@ -1,6 +1,6 @@
 {
   "name": "fluxapp-router",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A router for fluxApp",
   "main": "lib/index.js",
   "keywords": [
@@ -21,7 +21,7 @@
     "lodash": "^2.4.1",
     "path-match": "^1.2.2",
     "path-to-regexp": "^1.0.3",
-    "react": "^0.12.1"
+    "react": "^0.13.1"
   },
   "devDependencies": {
     "chai": "^1.10.0",
