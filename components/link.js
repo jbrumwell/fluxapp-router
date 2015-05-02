@@ -21,7 +21,7 @@ module.exports = React.createClass({
 
   flux: {
     stores: {
-      updateCurrentState: 'fluxappRouter'
+      updateCurrentState: 'router'
     }
   },
 
@@ -50,7 +50,7 @@ module.exports = React.createClass({
 
   _stateFromProps: function _stateFromProps(props) {
     var router = fluxApp.getRouter();
-    var store = this.getStore('fluxappRouter');
+    var store = this.getStore('router');
     var route = router.build(props.to, props.meta);
 
     this.setState({
@@ -60,7 +60,7 @@ module.exports = React.createClass({
   },
 
   updateCurrentState: function updateCurrentState() {
-    var store = this.getStore('fluxappRouter');
+    var store = this.getStore('router');
     var route = store.state.route;
 
     this.setState({
@@ -69,7 +69,7 @@ module.exports = React.createClass({
   },
 
   onClick: function onClick(e) {
-    var actions = this.getActions('fluxappRouter');
+    var actions = this.getActions('router');
 
     e.preventDefault();
 

@@ -26,7 +26,7 @@ module.exports = React.createClass({
   },
 
   onSubmit : function handleSubmit(e) {
-    var actions = this.getActions('fluxAppRouter');
+    var actions = this.getActions('router');
 
     e.preventDefault();
 
