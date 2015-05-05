@@ -1,39 +1,71 @@
 # fluxapp-router
 
-A router for fluxapp. Manages the current page state, gives you info about the 
-currently opened page and history, and gracefully degrades on non-historyAPI 
+A router plugin for [Fluxapp](http://www.github.com/colonyamerican/fluxapp). Manages the current page state, gives you info about the
+currently opened page and history, and gracefully degrades on non-historyAPI
 and non-js browsers.
 
-### Usage
+## Installation
 
-The router is not to be used directly. After a platform is set in
-`fluxApp` it can be required like:
+`npm install --save fluxapp-router`
 
-    var router = fluxApp.getRouter();
+## Usage
 
-The current state is kept in a vanilla fluxApp store, which can be
-accessed with a `getStore()` method on the `router` object. You will
-want to add some watchers to trigger re-renders of your page when the
-state changes.
+```js
+'use strict';
 
-Then inside your views, you need some links that are router-compatible, so that
-they don't require your whole page to reload (that would be wasteful):
+import fluxApp from 'fluxapp';
+import fluxAppRouter from 'fluxapp-router';
 
-    var Link = router.components.Link;
+fluxApp.registerPlugins({
+  router: fluxAppRouter,
+});
+```
 
-    ...
+## Actions
 
-    render: function() {
-      return <Link href='/hi'>Hi, I am a link</Link>;
+Fluxapp router exposes a method on the fluxapp context `getRouterActions()` but is also available under the namespace `router` using `getActions('router')`
 
+### go / forward / back
 
-Used this way, this link will trigger a router state change, and if no routing is available
-in your browser, will degrade to a simple link. All the properties apart from `force` will be
-passed to the internal `<a>` instance transparently.
+```js
+export default React.createClass({
+  mixins: [fluxapp.mixins.component],
 
-#### URL patterns
+  statics: {
+    willTransitionTo: function() {},
+    willTransitionFrom: function() {},
+  },
 
-fluxapp-router uses Fluxapp routing internally to expand and match urls. 
-Fluxapp uses [path-to-regexp](https://github.com/component/path-to-regexp) and 
-if you are wondering how to construct urls, please consult its documentation.
+  onBackClick(event) {
+    const actions = this.getActions('router');
+    const forward = this.state.forward;
+    const previous = this.state.previous;
+    const options = {};
 
+    if (previous) {
+      actions.back();
+    } else if (forward) {
+      actions.forward();
+    } else {
+      actions.go('routeid', options);
+    }
+
+    event.preventDefault();
+  },
+
+})
+```
+
+## Components
+
+### Link
+
+```js
+import Link from 'react-router/components';
+
+return <Link to="routerid" meta={customOptions} onClick={customOnCLick} />
+```
+
+## Options
+
+Options provided should be compatible with those used by fluxapps internal router#build method.  
