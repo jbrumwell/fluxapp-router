@@ -21,6 +21,14 @@ fluxApp.registerPlugins({
 });
 ```
 
+Router binds to special static methods on components:
+
+    willTransitionTo
+    willTransitionFrom
+
+which enables the components to do some setup at transitions. If `false`
+is returned from any of them, the transition will be cancelled.
+
 ## Actions
 
 Fluxapp router exposes a method on the fluxapp context `getRouterActions()` but is also available under the namespace `router` using `getActions('router')`
@@ -63,7 +71,8 @@ export default React.createClass({
 ```js
 import Link from 'react-router/components';
 
-return <Link to="routerid" meta={customOptions} onClick={customOnCLick} />
+<Link to="routerid" meta={customOptions} onClick={customOnCLick} />
+<Link to="/route/url" meta={customOptions} onClick={customOnCLick} />
 ```
 
 ## Options
