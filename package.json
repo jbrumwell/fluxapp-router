@@ -1,6 +1,6 @@
 {
   "name": "fluxapp-router",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A router for fluxApp",
   "main": "lib/index.js",
   "keywords": [
@@ -15,6 +15,9 @@
   "author": {
     "name": "Michal Kawalec"
   },
+  "contributors": [
+    "Jason Brumwell"
+  ],
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.9.25"
