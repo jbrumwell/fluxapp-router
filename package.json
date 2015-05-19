@@ -18,6 +18,10 @@
   "contributors": [
     "Jason Brumwell"
   ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/colonyamerican/fluxapp-router.git"
+  },
   "license": "MIT",
   "dependencies": {
     "bluebird": "^2.9.25"
