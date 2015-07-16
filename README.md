@@ -37,7 +37,7 @@ Fluxapp router exposes a method on the fluxapp context `getRouterActions()` but 
 
 ```js
 export default React.createClass({
-  mixins: [fluxapp.mixins.component],
+  mixins: [fluxApp.mixins.component],
 
   statics: {
     willTransitionTo: function() {},
