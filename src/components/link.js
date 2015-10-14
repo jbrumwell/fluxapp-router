@@ -1,48 +1,42 @@
 import React from 'react';
-import fluxapp from 'fluxapp';
+import fluxapp, { Component as FluxappComponent } from 'fluxapp';
 import _ from 'lodash';
 
 const a = React.DOM.a;
 
-export default React.createClass({
-  displayName : 'RouteLink',
-
-  mixins : [ fluxapp.mixins.component ],
-
-  propTypes : {
+export default class RouteLink extends FluxappComponent {
+  static propTypes = {
     to : React.PropTypes.string.isRequired,
     meta : React.PropTypes.object.isRequired,
     onClick : React.PropTypes.func,
-  },
+  };
 
-  flux : {
-    stores : {
-      updateCurrentState : 'router',
-    },
-  },
+  static stores = {
+    updateCurrentState : 'router',
+  }
 
-  getDefaultProps() {
-    return {
-      meta : {},
-    };
-  },
+  static defaultProps = {
+    meta : {},
+  }
 
-  getInitialState() {
-    return {
+  constructor(props, context, updater) {
+    super(...arguments);
+
+    this.state = {
       active : false,
       url : '',
     };
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     if (! _.isEqual(nextProps, this.props)) {
       this._stateFromProps(nextProps);
     }
-  },
+  }
 
   componentWillMount() {
     this._stateFromProps(this.props);
-  },
+  }
 
   _stateFromProps(props) {
     const router = fluxapp.getRouter();
@@ -55,7 +49,7 @@ export default React.createClass({
         active : store.isActive(route.url),
       });
     }
-  },
+  }
 
   updateCurrentState() {
     const store = this.getStore('router');
@@ -63,7 +57,7 @@ export default React.createClass({
     this.setState({
       active : store.isActive(this.state.url),
     });
-  },
+  }
 
   onClick(e) {
     var actions = this.getActions('router');
@@ -71,7 +65,7 @@ export default React.createClass({
     e.preventDefault();
 
     actions.go(this.state.url, this.props.meta);
-  },
+  }
 
   render() {
     const props = _.extend(
@@ -87,5 +81,5 @@ export default React.createClass({
     }
 
     return a(props);
-  },
-});
+  }
+}

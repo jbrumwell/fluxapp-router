@@ -1,26 +1,25 @@
 import React from 'react';
 import _ from 'lodash';
-import fluxApp from 'fluxapp';
+import { Component as FluxappComponent } from 'fluxapp';
 
 const form = React.DOM.form;
 
-export default React.createClass({
-  displayName : 'RouteForm',
-
-  mixins : [ fluxApp.mixins.component ],
-
-  propTypes : {
+export class RouteForm extends FluxappComponent {
+  static propTypes = {
     to : React.PropTypes.string.isRequired,
     meta : React.PropTypes.object.isRequired,
-    onSubmit : React.PropTypes.func.isRequired,
-  },
+    onSubmit : React.PropTypes.func,
+  };
 
-  getDefaultProps() {
-    return {
-      meta : {},
-      onSubmit : this.onSubmit,
-    };
-  },
+  static defaultProps = {
+    meta : {},
+  }
+
+  constructor() {
+    super(...arguments);
+
+    this.props.onSubmit = this.props.onSubmit ? this.props.onSubmit : this.onSubmit.bind(this);
+  }
 
   onSubmit(e) {
     const actions = this.getActions('router');
@@ -28,11 +27,11 @@ export default React.createClass({
     e.preventDefault();
 
     actions.go(this.props.to, this.props.meta);
-  },
+  }
 
   render() {
     const props = _.extend({}, _.omit(this.props, ['to', 'meta']));
 
     return form(props);
-  },
-});
+  }
+}
