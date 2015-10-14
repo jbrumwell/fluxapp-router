@@ -4,7 +4,7 @@ import { Component as FluxappComponent } from 'fluxapp';
 
 const form = React.DOM.form;
 
-export class RouteForm extends FluxappComponent {
+export default class RouteForm extends FluxappComponent {
   static propTypes = {
     to : React.PropTypes.string.isRequired,
     meta : React.PropTypes.object.isRequired,

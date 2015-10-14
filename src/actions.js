@@ -12,13 +12,17 @@ export default (name, options = { method : 'history' }) => {
 
   const RouterActions = class extends BaseActions {
     init(url, meta) {
+      const historyEnabled = isHistoryEnabled();
+
+      url = historyEnabled ? url : url.replace('#', '');
+
       const request = router.build(url, meta, false);
 
       if (! request) {
         throw new Error('fluxapp:router:init unable to locate route specified', url);
       }
 
-      if (isHistoryEnabled()) {
+      if (historyEnabled) {
         window.history.replaceState(
           request,
           request.title || '',
