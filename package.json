@@ -1,6 +1,6 @@
 {
   "name": "fluxapp-router",
-  "version": "1.1.6",
+  "version": "1.2.0",
   "description": "A router for fluxApp",
   "main": "lib/index.js",
   "keywords": [
@@ -45,6 +45,6 @@
     "webpack": "^1.4.13"
   },
   "peerDependencies": {
-    "fluxapp": "^0.1.0"
+    "fluxapp": "^0.2.0"
   }
 }
