@@ -74,7 +74,7 @@ export default class RouteLink extends FluxappComponent {
     const props = _.extend(
       {
         href : this.state.url,
-        onClick : this.onClick,
+        onClick : this.onClick.bind(this),
       },
       _.omit(this.props, ['to', 'meta'])
     );
