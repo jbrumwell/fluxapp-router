@@ -9,8 +9,7 @@ function promiseMethod(target, name, descriptor) {
   return descriptor;
 }
 
-
-export default (name) => {
+export default (name, options = { method : 'history' }) => {
   const RouterStore = class extends BaseStore {
     static actions = {
       onInit : `${name}.init`,
@@ -58,6 +57,10 @@ export default (name) => {
     }
 
     _transition(from, to) {
+      if (options.method !== 'history') {
+        to.url = `#${to.url}`;
+      }
+
       this._transitionFrom(from, to)
           .then(this._transitionTo.bind(this, to))
           .then((transition) => {

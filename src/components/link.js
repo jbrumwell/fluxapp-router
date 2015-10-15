@@ -39,8 +39,9 @@ export default class RouteLink extends FluxappComponent {
   }
 
   _stateFromProps(props) {
+    const context = this.getFluxappContext();
     const router = fluxapp.getRouter();
-    const store = this.getStore('router');
+    const store = context.getRouterStore();
     const route = router.build(props.to, props.meta);
 
     if (route) {
@@ -52,7 +53,8 @@ export default class RouteLink extends FluxappComponent {
   }
 
   updateCurrentState() {
-    const store = this.getStore('router');
+    const context = this.getFluxappContext();
+    const store = context.getRouterStore();
 
     this.setState({
       active : store.isActive(this.state.url),
@@ -60,7 +62,8 @@ export default class RouteLink extends FluxappComponent {
   }
 
   onClick(e) {
-    var actions = this.getActions('router');
+    const context = this.getFluxappContext();
+    const actions = context.getRouterActions();
 
     e.preventDefault();
 

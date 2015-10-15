@@ -9,7 +9,7 @@ export default (name) => {
     },
 
     registerRouteHandler(handler) {
-      var store = this.getStore(name);
+      const store = this.getStore(name);
 
       store.addChangeListener(handler);
 

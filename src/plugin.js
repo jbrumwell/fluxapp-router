@@ -5,7 +5,7 @@ import contextMethods from './context-methods';
 export default (options) => {
   return (fluxapp, name) => {
     return {
-      stores : stores(name),
+      stores : stores(name, options),
       actions : actions(name, options),
       contextMethods : contextMethods(name),
     };

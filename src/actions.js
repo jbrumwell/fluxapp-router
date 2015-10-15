@@ -1,21 +1,20 @@
 /* global window */
 import fluxapp, { BaseActions } from 'fluxapp';
 
-const router = fluxapp.getRouter();
-
 export default (name, options = { method : 'history' }) => {
-  function isHistoryEnabled() {
-    return options.method === 'history' &&
-           typeof window !== 'undefined' &&
-           window.history;
-  }
+  const router = fluxapp.getRouter();
 
   const RouterActions = class extends BaseActions {
+    constructor() {
+      super(...arguments);
+
+      this.popstate = this.popstate.bind(this);
+      this.hashchange = this.hashchange.bind(this);
+    }
+
     init(url, meta) {
-      const historyEnabled = isHistoryEnabled();
-
+      const historyEnabled = this._isHistoryEnabled();
       url = historyEnabled ? url : url.replace('#', '');
-
       const request = router.build(url, meta, false);
 
       if (! request) {
@@ -28,13 +27,47 @@ export default (name, options = { method : 'history' }) => {
           request.title || '',
           request.url
         );
-
-        window.addEventListener('popstate', this.popstate.bind(this), false);
-      } else {
-        window.addEventListener('hashchange', this.hashchange.bind(this), false);
       }
 
+      this._bindEventHandlers();
+
       return request;
+    }
+
+    _bindEventHandlers() {
+      if (this._isClientSide()) {
+        if (this._isHistoryEnabled()) {
+          window.addEventListener('popstate', this.popstate, false);
+        } else {
+          window.addEventListener('hashchange', this.hashchange, false);
+        }
+      }
+    }
+
+    _isHistoryEnabled() {
+      return options.method === 'history' &&
+             this._isClientSide() &&
+             window.history;
+    }
+
+    _isClientSide() {
+      return typeof window !== 'undefined';
+    }
+
+    _updateClientSide(request) {
+      if (this._isClientSide()) {
+        if (this._isHistoryEnabled()) {
+          window.history.pushState(
+            request,
+            request.title,
+            request.url
+          );
+        } else {
+          window.removeEventListener('hashchange', this.hashchange);
+          window.location.hash = request.url;
+          window.addEventListener('hashchange', this.hashchange, false);
+        }
+      }
     }
 
     hashchange() {
@@ -59,30 +92,24 @@ export default (name, options = { method : 'history' }) => {
         throw new Error('fluxapp:router:Go unable to locate route specified', id);
       }
 
-      if (isHistoryEnabled()) {
-        window.history.pushState(
-          request,
-          request.title,
-          request.url
-        );
-      }
+      this._updateClientSide(request);
 
       return request;
     }
 
     back() {
-      if (isHistoryEnabled()) {
+      if (this._isHistoryEnabled()) {
         window.history.back();
       } else {
-        throw new Error('Fluxapp:Router back is not available in hash routing');
+        throw new Error('Fluxapp:Router back is only support on client side when using history');
       }
     }
 
     forward() {
-      if (isHistoryEnabled()) {
+      if (this._isHistoryEnabled()) {
         window.history.forward();
       } else {
-        throw new Error('Fluxapp:Router forward is not available in hash routing');
+        throw new Error('Fluxapp:Router forward is only support on client side when using history');
       }
     }
   };

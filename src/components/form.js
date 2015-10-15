@@ -22,7 +22,8 @@ export default class RouteForm extends FluxappComponent {
   }
 
   onSubmit(e) {
-    const actions = this.getActions('router');
+    const context = this.getFluxappContext();
+    const actions = context.getRouterActions();
 
     e.preventDefault();
 
