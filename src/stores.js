@@ -101,6 +101,10 @@ export default (name, options = { method : 'history' }) => {
       return route && currentId && route.id === currentId;
     }
 
+    isHistoryEnabled() {
+      return options.method === 'history';
+    }
+
     getLastRequest() {
       return this.state.lastRequest;
     }
