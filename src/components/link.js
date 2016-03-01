@@ -9,7 +9,6 @@ export default class RouteLink extends FluxappComponent {
     to : React.PropTypes.string.isRequired,
     meta : React.PropTypes.object.isRequired,
     onClick : React.PropTypes.func,
-    back : React.PropTypes.bool,
   };
 
   static stores = {
@@ -68,11 +67,7 @@ export default class RouteLink extends FluxappComponent {
 
     e.preventDefault();
 
-    if (! this.props.back) {
-      actions.go(this.state.url, this.props.meta);
-    } else {
-      actions.back();
-    }
+    actions.go(this.state.url, this.props.meta);
   }
 
   render() {
