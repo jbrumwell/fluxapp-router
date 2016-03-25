@@ -63,7 +63,7 @@ export default (name, options = { method : 'history' }) => {
             request.url
           );
         } else {
-          window.removeEventListener('hashchange', this.hashchange);
+          window.removeEventListener('hashchange', this.hashchange, false);
           window.location.hash = request.url;
           window.addEventListener('hashchange', this.hashchange, false);
         }
