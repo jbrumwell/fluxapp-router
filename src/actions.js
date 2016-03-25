@@ -10,6 +10,7 @@ export default (name, options = { method : 'history' }) => {
 
       this.popstate = this.popstate.bind(this);
       this.hashchange = this.hashchange.bind(this);
+      this.currentHash = null;
     }
 
     init(url, meta) {
@@ -27,6 +28,8 @@ export default (name, options = { method : 'history' }) => {
           request.title || '',
           request.url
         );
+      } else {
+        this.currentHash = url;
       }
 
       this._bindEventHandlers();
@@ -63,16 +66,18 @@ export default (name, options = { method : 'history' }) => {
             request.url
           );
         } else {
-          window.removeEventListener('hashchange', this.hashchange, false);
+          this.currentHash = request.url;
           window.location.hash = request.url;
-          window.addEventListener('hashchange', this.hashchange, false);
         }
       }
     }
 
     hashchange() {
       const url = window.location.hash.replace('#', '');
-      this.go(url);
+
+      if (url !== this.currentHash) {
+        this.go(url);
+      }
     }
 
     popstate(event) {
