@@ -1,5 +1,6 @@
 import Promise from 'bluebird';
 import fluxapp, { BaseStore } from 'fluxapp';
+import _ from 'lodash';
 
 const router = fluxapp.getRouter();
 
@@ -67,7 +68,7 @@ export default (name, options = { method : 'history' }) => {
             transition = transition !== false;
 
             if (transition) {
-              to.lastRequest = this.getState();
+              to.lastRequest = _.omit(this.getMutableState(), 'lastRequest');
 
               this.setState(to);
             }
